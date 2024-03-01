@@ -1,10 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title></title>
-<meta name="viewport" content="width=device-width">
-<script>
+( () => {
 
 // if client hints are supported, don’t do anything
 if ( document.featurePolicy &&
@@ -67,24 +61,4 @@ const mo = new MutationObserver( ( mutations ) => {
 // start MutationObserving the document
 mo.observe( document, { childList: true, subtree: true } );
 
-</script>
-<style>
-img {
-	width: 50%;
-	height: auto;
-}
-</style>
-</head>
-<body>
-
-<img
-	src="https://o.img.rodeo/b_tomato,ar_2,w_auto:300:600/t_WxH/_.png"
-	sizes="auto"
-	loading="lazy"
-	width="2000"
-	height="1000"
->
-
-
-</body>
-</html>
+} )();
