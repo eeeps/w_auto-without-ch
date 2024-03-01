@@ -6,20 +6,44 @@
 <meta name="viewport" content="width=device-width">
 <script>
 
-// when <img> elements come into the dom, start observing their size
+
+const wAutoRegExp = /(.+)w_auto\:(\d+)\:(\d+)(.+)/;
+const urlHasWAuto = ( urlString ) => wAutoRegExp.test( urlString );
+const rewriteWAuto = ( urlString, pxSizeNumber ) => {
+	const matched = urlString.match( wAutoRegExp );
+	if ( matched === null ) {
+		// fail silently. error instead?
+		return urlString;
+	}
+	return `${ matched[1] }w_auto:${ matched[2] }:${ Math.round( pxSizeNumber ).toString() }${ matched[4] }`;
+}
+const eligibleForRewrite = ( imgEl ) => ( 
+	!( imgEl.complete ) && // This doesn't catch in-progress loads
+	                       // But I think it's the best we can do?
+	imgEl.getAttribute( 'loading' ) === 'lazy' && 
+	imgEl.hasAttribute( 'src' ) &&
+	urlHasWAuto( imgEl.src )
+);
+
 const ro = new ResizeObserver( ( entries ) => {
 	entries.forEach( ( entry ) => {
-		// if the image has loaded
-		// disconnect and return
-		// else
-		if ( entry.contentRect.width > 0 ) { // if the <img> has been laid out
-		     // and has sizes
-		     // and has a cloudinary w_auto:x:y url
-		     // replace the sizes, and rewrite the cloudinary url
-		     // todo double partial loads still possible?
-			console.log( entry.contentRect.width );
-			console.log( entry.target.complete );
+		
+		// if the <img> has been laid out
+		if ( entry.contentRect.width > 0 || entry.contentRect.height > 0 ) { 
+			
+			// if it's (still) eligible for a re-write
+			if ( eligibleForRewrite( entry.target ) ) {
+				entry.target.src = rewriteWAuto(
+					entry.target.src,
+					entry.contentRect.width * window.devicePixelRatio
+				);
+			}
+			
+			// unobserve after it has been laid out no matter what
+			ro.unobserve( entry.target );
+			
 		}
+		
 	} );
 } );
 
@@ -27,7 +51,8 @@ const mo = new MutationObserver( ( mutations ) => {
 	for ( const mutation of mutations ) {
 		for ( const newNode of mutation.addedNodes ) {
 			if ( newNode.nodeType === 1 && // elements only, no text!
-			     newNode.nodeName === "IMG" ) { // and just IMG elements please
+			     newNode.nodeName === "IMG" && // just IMG elements
+			     eligibleForRewrite( newNode ) ) {
 				ro.observe( newNode );
 			}
 		}
@@ -40,7 +65,7 @@ mo.observe( document, { childList: true, subtree: true } );
 </script>
 <style>
 img {
-	width: 25%;
+	width: 50%;
 	height: auto;
 }
 </style>
@@ -48,12 +73,11 @@ img {
 <body>
 
 <img
-	src="https://o.img.rodeo/f_auto,q_auto,c_limit,w_auto:300:600/dogs/7"
+	src="https://o.img.rodeo/b_tomato,ar_2,w_auto:300:600/t_WxH/_.png"
 	sizes="auto"
 	loading="lazy"
-	width="6000"
-	height="4000"
-	alt="A dog chasing a ball."
+	width="2000"
+	height="1000"
 >
 
 
