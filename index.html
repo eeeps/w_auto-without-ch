@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width">
 <script>
 
+// if client hints are supported, don’t do anything
+if ( document.featurePolicy &&
+     document.featurePolicy.allowsFeature( 'ch-width' ) ) {
+	return;
+}
 
 const wAutoRegExp = /(.+)w_auto\:(\d+)\:(\d+)(.+)/;
 const urlHasWAuto = ( urlString ) => wAutoRegExp.test( urlString );
