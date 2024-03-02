@@ -35,7 +35,7 @@ That’ll look something like this:
 
 ### Notes!
 
-- If the [browser supports the Responsive Image Client Hints](https://caniuse.com/client-hints-dpr-width-viewport), we assume an actual `Sec-CH-Width` hint will be sent; the script does nothing.
+- If the [browser supports the Responsive Image Client Hints](https://caniuse.com/client-hints-dpr-width-viewport), we assume `Sec-CH-Width` hints will be sent; the script does nothing.
 - In case JavaScript is disabled, or the script fails for any other reason, set the `<fallback-width>` to something sensible in your HTML.
 - Because we steadfastly refuse to double-load images, or artificially delay an image load, this script will only rewrite the `src` attributes of lazy-loaded `<img>`s, before their loads start. [`<img>`s that could possibly be responsible for the Largest Contentful Paint should never be lazy-loaded](https://web.dev/articles/lcp-lazy-loading); for LCP images, your options are:
 	1. Accept a lack of responsive sizing in browsers that don’t support Responsive Image Client Hints (loading a too-big image ASAP will usually be faster than loading a right-sized image, late).
