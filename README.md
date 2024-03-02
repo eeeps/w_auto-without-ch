@@ -18,7 +18,7 @@ Luckily, it’s only ~700 bytes (500B compressed).
 Once you’ve got the blocking script in the `<head>`, your `<img>`s need to:
 
 - have a `loading="lazy"` attribute;
-- have a `src` that includes Cloudinary’s [`w_auto` transformation](https://cloudinary.com/documentation/transformation_reference#w_auto), with all three parameters set (we re-write the last one, `<fallback width>`, to send Cloudinary the layout width).
+- have a `src` that includes Cloudinary’s [`w_auto` transformation](https://cloudinary.com/documentation/transformation_reference#w_auto), with both extra parameters set (we re-write the last one, `<fallback width>`, to send Cloudinary the layout width).
 
 That’ll look something like this:
 
@@ -36,7 +36,7 @@ That’ll look something like this:
 ### Notes!
 
 - If the [browser supports the Responsive Image Client Hints](https://caniuse.com/client-hints-dpr-width-viewport), we assume `Sec-CH-Width` hints will be sent; the script does nothing.
-- In case JavaScript is disabled, or the script fails for any other reason, set the `<fallback-width>` to something sensible in your HTML.
+- We require both parameters so that, in cases when the script does not re-write the URL, you’ve considered the `<fallback-width>` parameter and set it to something sensible.
 - Because we steadfastly refuse to double-load images, or artificially delay an image load, this script will only rewrite the `src` attributes of lazy-loaded `<img>`s, before their loads start. [`<img>`s that could possibly be responsible for the Largest Contentful Paint should never be lazy-loaded](https://web.dev/articles/lcp-lazy-loading); for LCP images, your options are:
 	1. Accept a lack of responsive sizing in browsers that don’t support Responsive Image Client Hints (loading a too-big image ASAP will usually be faster than loading a right-sized image, late).
 	2. Abandon Client Hints altogether, accept a bunch of complexity, and write a `srcset` and (non-`auto`) `sizes`.
