@@ -29,7 +29,7 @@ That’ll look something like this:
 	sizes="auto"
 	width="9000"
 	height="6000"
-	alt="A black-and-white dog, facing the camera, eagerly bearing down on a tennis ball."
+	alt="A black-and-white dog, running toward the camera, eagerly bearing down on a tennis ball."
 >
 ```
 
