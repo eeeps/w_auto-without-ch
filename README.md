@@ -11,7 +11,7 @@ Self-host the minified file somewhere and load it:
 
 This script needs to see `<img>`s as soon as they are parsed, so that it can prepare to re-write their URLs as soon as they’re laid out. If the script executes after an `<img>` has been parsed, it won’t get a chance to do any of that; it’ll do nothing.
 
-Luckily, it’s only ~700 bytes (500B compressed).
+Luckily, it’s only ~950 bytes (~600B compressed).
 
 ## Usage
 
@@ -40,3 +40,4 @@ That’ll look something like this:
 - Because we steadfastly refuse to double-load images, or artificially delay an image load, this script will only rewrite the `src` attributes of lazy-loaded `<img>`s, before their loads start. [`<img>`s that could possibly be responsible for the Largest Contentful Paint should never be lazy-loaded](https://web.dev/articles/lcp-lazy-loading); for LCP images, your options are:
 	1. Accept a lack of responsive sizing in browsers that don’t support Responsive Image Client Hints (loading a too-big image ASAP will usually be faster than loading a right-sized image, late).
 	2. Abandon Client Hints altogether, accept a bunch of complexity, and write a `srcset` and (non-`auto`) `sizes`.
+- Works to re-write `<picture><source srcsets>` too, in order to support art direction, but only on first load (it won't continue to update URLs despite the `picture` continuing to react to viewport resizes).
