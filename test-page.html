@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width">
 
 <!-- can't be async or deferred! -->
-<script src="w_auto-ch-polyfill.js"></script>
+<script src="w_auto-without-ch.js"></script>
 
 <style>
 img {
@@ -17,6 +17,10 @@ img {
 </head>
 <body>
 
+<picture>
+<source
+	media="(max-width: 600px)"
+	srcset="https://o.img.rodeo/b_goldenrod,ar_1,w_auto:300:600/t_WxH/_.png">
 <img
 	src="https://o.img.rodeo/b_tomato,ar_2,w_auto:300:600/t_WxH/_.png"
 	sizes="auto"
@@ -24,6 +28,7 @@ img {
 	width="2000"
 	height="1000"
 >
+</picture>
 
 
 </body>

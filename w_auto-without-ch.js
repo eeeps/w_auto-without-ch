@@ -6,16 +6,16 @@ if ( document.featurePolicy &&
 	return;
 }
 
-const wAutoRegExp = /(.+)w_auto\:(\d+)\:(\d+)(.+)/;
+// intentionally not global, we don't support srcsets with lists
+const wAutoRegExp = /w_auto\:(\d+)\:(\d+)/;
 const urlHasWAuto = ( urlString ) => wAutoRegExp.test( urlString );
-const rewriteWAuto = ( urlString, pxSizeNumber ) => {
-	const matched = urlString.match( wAutoRegExp );
-	if ( matched === null ) {
-		// fail silently. error instead?
-		return urlString;
-	}
-	return `${ matched[1] }w_auto:${ matched[2] }:${ Math.round( pxSizeNumber ).toString() }${ matched[4] }`;
-}
+const rewriteWAuto = ( urlString, pxSizeNumber ) =>
+	urlString.replace( wAutoRegExp, 
+		( match, roundingStep ) =>
+			`w_auto:${ roundingStep }:${ Math.round( pxSizeNumber ) }`
+	)
+;
+
 const eligibleForRewrite = ( imgEl ) => ( 
 	!( imgEl.complete ) && // This doesn't catch in-progress loads
 	                       // But I think it's the best we can do?
@@ -30,12 +30,36 @@ const ro = new ResizeObserver( ( entries ) => {
 		// if the <img> has been laid out
 		if ( entry.contentRect.width > 0 || entry.contentRect.height > 0 ) { 
 			
+			const width = entry.contentRect.width * window.devicePixelRatio;
+			
 			// if it's (still) eligible for a re-write
 			if ( eligibleForRewrite( entry.target ) ) {
-				entry.target.src = rewriteWAuto(
-					entry.target.src,
-					entry.contentRect.width * window.devicePixelRatio
-				);
+				
+				// if it's in a <picture>, rewrite the first matching source element’s srcset
+				let matchedSource = false;
+				if ( entry.target.parentNode.tagName === "PICTURE" ) {
+					const sourceElements = entry.target.parentNode.querySelectorAll( 'source[media]' );
+					for ( const sourceEl of sourceElements ) {
+						if ( window.matchMedia( sourceEl.getAttribute( 'media' ) ).matches ) {
+							const srcset = sourceEl.getAttribute( 'srcset' );
+							sourceEl.setAttribute( 'srcset', rewriteWAuto(
+								srcset,
+								width
+							) );
+							matchedSource = true;
+							break;
+						}
+					}
+				}
+				
+				// if it's not, or if there were not matching source elements, rewrite the img src
+				if ( !matchedSource ) {
+					entry.target.src = rewriteWAuto(
+						entry.target.src,
+						width
+					);
+				}
+			
 			}
 			
 			// unobserve after it has been laid out no matter what
